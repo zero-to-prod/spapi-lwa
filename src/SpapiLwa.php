@@ -8,7 +8,7 @@ class SpapiLwa
      * @return array{info: mixed, error: string, response: mixed}
      * @link https://developer-docs.amazon.com/sp-api/docs/connecting-to-the-selling-partner-api#step-1-request-a-login-with-amazon-access-token
      */
-    public static function lwaRefreshToken(string $url, string $refresh_token, string $client_id, string $client_secret, ?string $user_agent = null): array
+    public static function refreshToken(string $url, string $refresh_token, string $client_id, string $client_secret, ?string $user_agent = null): array
     {
         $CurlHandle = curl_init($url);
 
@@ -41,7 +41,7 @@ class SpapiLwa
      * @return array{info: mixed, error: string, response: mixed}
      * @link https://developer-docs.amazon.com/sp-api/docs/connecting-to-the-selling-partner-api#step-1-request-a-login-with-amazon-access-token
      */
-    public static function lwaClientCredentials(string $url, string $scope, string $client_id, string $client_secret, ?string $user_agent = null): array
+    public static function clientCredentials(string $url, string $scope, string $client_id, string $client_secret, ?string $user_agent = null): array
     {
         $CurlHandle = curl_init($url);
 
