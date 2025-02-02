@@ -1,14 +1,14 @@
 {
-  "name": "zero-to-prod/:slug",
-  "description": ":description",
+  "name": "zero-to-prod/spapi-lwa",
+  "description": "Connect to Amazons Selling Partner API with Login With Amazon (LWA).",
   "license": "MIT",
   "type": "library",
   "keywords": [
     "zero-to-prod",
-    ":slug"
+    "spapi-lwa"
   ],
   "readme": "./README.md",
-  "time": ":time",
+  "time": "2025-02-02",
   "authors": [
     {
       "name": "David Smith",
@@ -17,13 +17,13 @@
       "role": "maintainer"
     }
   ],
-  "homepage": "https://github.com/zero-to-prod/:slug",
+  "homepage": "https://github.com/zero-to-prod/spapi-lwa",
   "support": {
     "email": "dave0016@gmail.com",
-    "issues": "https://github.com/zero-to-prod/:slug/issues",
-    "source": "https://github.com/zero-to-prod/:slug",
-    "docs": "https://zero-to-prod.github.io/:slug/",
-    "security": "https://github.com/zero-to-prod/:slug/blob/main/SECURITY.md"
+    "issues": "https://github.com/zero-to-prod/spapi-lwa/issues",
+    "source": "https://github.com/zero-to-prod/spapi-lwa",
+    "docs": "https://zero-to-prod.github.io/spapi-lwa/",
+    "security": "https://github.com/zero-to-prod/spapi-lwa/blob/main/SECURITY.md"
   },
   "funding": [
     {
@@ -32,7 +32,10 @@
     }
   ],
   "require": {
-    "php": ">=7.1"
+    "php": ">=7.1",
+    "zero-to-prod/dock": "^1.0",
+    "ext-curl": "*",
+    "ext-json": "*"
   },
   "require-dev": {
     "phpunit/phpunit": "*",
@@ -40,7 +43,7 @@
   },
   "autoload": {
     "psr-4": {
-      "Zerotoprod\\:namespace\\": "src/"
+      "Zerotoprod\\SpapiLwa\\": "src/"
     }
   },
   "autoload-dev": {
@@ -49,6 +52,6 @@
     }
   },
   "bin": [
-    "bin/:slug"
+    "bin/spapi-lwa"
   ]
 }
