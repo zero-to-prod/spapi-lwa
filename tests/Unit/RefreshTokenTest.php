@@ -5,20 +5,12 @@ namespace Tests\Unit;
 use Tests\TestCase;
 use Zerotoprod\SpapiLwa\SpapiLwa;
 
-class LwaRefreshTokenTest extends TestCase
+class RefreshTokenTest extends TestCase
 {
     /** @test */
-    public function lwa_refresh_token_test(): void
+    public function refresh_token(): void
     {
-        $response = SpapiLwa::lwaRefreshToken(
-            'https://api.amazon.com/auth/o2/token',
-            'refresh_token',
-            'client_id',
-            'client_secret',
-            'user-agent'
-        );
-
-        $response = SpapiLwa::lwaRefreshToken(
+        $response = SpapiLwa::refreshToken(
             'https://httpbin.org/post',
             'refresh_token',
             'client_id',
