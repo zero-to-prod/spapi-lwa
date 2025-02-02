@@ -5,12 +5,12 @@ namespace Tests\Unit;
 use Tests\TestCase;
 use Zerotoprod\SpapiLwa\SpapiLwa;
 
-class LwaClientCredentialsTest extends TestCase
+class ClientCredentialsTest extends TestCase
 {
     /** @test */
-    public function lwa_refresh_token_test(): void
+    public function client_credentials(): void
     {
-        $response = SpapiLwa::lwaClientCredentials(
+        $response = SpapiLwa::clientCredentials(
             'https://httpbin.org/post',
             'scope',
             'client_id',
