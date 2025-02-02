@@ -22,7 +22,7 @@
 
 ## Introduction
 
-Connect to Amazons Selling Partner API with Login With Amazon (LWA).
+Connect to Amazons Selling Partner API with [Login With Amazon](https://developer-docs.amazon.com/sp-api/docs/connecting-to-the-selling-partner-api) (LWA).
 
 ## Requirements
 
