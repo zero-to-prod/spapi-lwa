@@ -5,7 +5,7 @@ namespace Zerotoprod\SpapiLwa;
 class SpapiLwa
 {
     /**
-     * @return array{info: mixed, error: string, response: mixed}
+     * @return array{info: mixed, error: string, response: array{access_token:string, refresh_token:string, token_type:string, expires_in: string}}
      * @link https://developer-docs.amazon.com/sp-api/docs/connecting-to-the-selling-partner-api#step-1-request-a-login-with-amazon-access-token
      */
     public static function refreshToken(string $url, string $refresh_token, string $client_id, string $client_secret, ?string $user_agent = null): array
@@ -38,7 +38,7 @@ class SpapiLwa
     }
 
     /**
-     * @return array{info: mixed, error: string, response: mixed}
+     * @return array{info: mixed, error: string, response: array{access_token:string, scope:string, token_type:string, expires_in: string}}
      * @link https://developer-docs.amazon.com/sp-api/docs/connecting-to-the-selling-partner-api#step-1-request-a-login-with-amazon-access-token
      */
     public static function clientCredentials(string $url, string $scope, string $client_id, string $client_secret, ?string $user_agent = null): array
