@@ -46,7 +46,7 @@ authorization from a selling partner. When specifying this value, include the rr
 ```php
 use Zerotoprod\SpapiLwa\SpapiLwa;
 
-$response = SpapiLwa::lwaRefreshToken(
+$response = SpapiLwa::refreshToken(
             'https://api.amazon.com/auth/o2/token',
             'refresh_token',
             'client_id',
@@ -60,7 +60,7 @@ Use this for calling grantless operations. When specifying this value, include t
 ```php
 use Zerotoprod\SpapiLwa\SpapiLwa;
 
-SpapiLwa::lwaClientCredentials(
+SpapiLwa::clientCredentials(
             'https://api.amazon.com/auth/o2/token',
             'scope',
             'client_id',
