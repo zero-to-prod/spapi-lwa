@@ -35,7 +35,8 @@
     "php": ">=7.1",
     "zero-to-prod/dock": "^1.0",
     "ext-curl": "*",
-    "ext-json": "*"
+    "ext-json": "*",
+    "zero-to-prod/curl-helper": "^1.0"
   },
   "require-dev": {
     "phpunit/phpunit": "*",

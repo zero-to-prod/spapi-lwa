@@ -2,6 +2,8 @@
 
 namespace Zerotoprod\SpapiLwa;
 
+use Zerotoprod\CurlHelper\CurlHelper;
+
 class SpapiLwa
 {
     /**
@@ -99,7 +101,7 @@ class SpapiLwa
         return [
             'info' => $info,
             'error' => $error,
-            'headers' => self::getParsedHeaders(explode("\r\n", substr($response, 0, $header_size))),
+            'headers' => CurlHelper::parseHeaders($response, $header_size),
             'response' => json_decode(substr($response, $header_size), true)
         ];
     }
@@ -198,21 +200,8 @@ class SpapiLwa
         return [
             'info' => $info,
             'error' => $error,
-            'headers' => self::getParsedHeaders(explode("\r\n", substr($response, 0, $header_size))),
+            'headers' => CurlHelper::parseHeaders($response, $header_size),
             'response' => json_decode(substr($response, $header_size), true)
         ];
-    }
-
-    protected static function getParsedHeaders(array $header_lines): array
-    {
-        $parsed_headers = [];
-        foreach ($header_lines as $line) {
-            if (strpos($line, ':') !== false) {
-                [$key, $value] = explode(':', $line, 2);
-                $parsed_headers[trim($key)] = trim($value);
-            }
-        }
-
-        return $parsed_headers;
     }
 }
