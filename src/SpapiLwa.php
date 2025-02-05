@@ -74,8 +74,14 @@ class SpapiLwa
      *
      * @link https://developer-docs.amazon.com/sp-api/docs/connecting-to-the-selling-partner-api#step-1-request-a-login-with-amazon-access-token
      */
-    public static function refreshToken(string $url, string $refresh_token, string $client_id, string $client_secret, ?string $user_agent = null): array
-    {
+    public static function refreshToken(
+        string $url,
+        string $refresh_token,
+        string $client_id,
+        string $client_secret,
+        ?string $user_agent = null,
+        array $options = []
+    ): array {
         return self::post(
             $url,
             [
@@ -84,7 +90,9 @@ class SpapiLwa
                 'client_id' => $client_id,
                 'client_secret' => $client_secret,
                 'user-agent' => ($user_agent ?: '(Language=PHP/'.PHP_VERSION.'; Platform='.php_uname('s').'/'.php_uname('r').')')
-            ]
+            ],
+            $user_agent,
+            $options
         );
     }
 
@@ -155,8 +163,14 @@ class SpapiLwa
      *  }
      * @link https://developer-docs.amazon.com/sp-api/docs/connecting-to-the-selling-partner-api#step-1-request-a-login-with-amazon-access-token
      */
-    public static function clientCredentials(string $url, string $scope, string $client_id, string $client_secret, ?string $user_agent = null): array
-    {
+    public static function clientCredentials(
+        string $url,
+        string $scope,
+        string $client_id,
+        string $client_secret,
+        ?string $user_agent = null,
+        array $options = []
+    ): array {
         return self::post(
             $url,
             [
@@ -165,20 +179,29 @@ class SpapiLwa
                 'client_id' => $client_id,
                 'client_secret' => $client_secret,
                 'user-agent' => ($user_agent ?: '(Language=PHP/'.PHP_VERSION.'; Platform='.php_uname('s').'/'.php_uname('r').')')
-            ]
+            ],
+            $user_agent,
+            $options
         );
     }
 
-    private static function post(string $url, array $fields): array
+    private static function post(string $url, array $postfields, ?string $user_agent = null, array $options = []): array
     {
         $CurlHandle = curl_init($url);
 
-        curl_setopt_array($CurlHandle, [
-            CURLOPT_POST => true,
-            CURLOPT_POSTFIELDS => http_build_query($fields),
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_HEADER => true,
-        ]);
+        curl_setopt_array(
+            $CurlHandle,
+            [
+                CURLOPT_HTTPHEADER => [
+                    'x-amz-date: '.gmdate('Ymd\THis\Z'),
+                    'user-agent: '.($user_agent ?: '(Language=PHP/'.PHP_VERSION.'; Platform='.php_uname('s').'/'.php_uname('r').')')
+                ],
+                CURLOPT_POST => true,
+                CURLOPT_POSTFIELDS => http_build_query($postfields),
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_HEADER => true,
+            ] + $options
+        );
 
         $response = curl_exec($CurlHandle);
         $info = curl_getinfo($CurlHandle);
