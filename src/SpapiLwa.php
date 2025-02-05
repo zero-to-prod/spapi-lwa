@@ -76,34 +76,16 @@ class SpapiLwa
      */
     public static function refreshToken(string $url, string $refresh_token, string $client_id, string $client_secret, ?string $user_agent = null): array
     {
-        $CurlHandle = curl_init($url);
-
-        curl_setopt_array($CurlHandle, [
-            CURLOPT_POST => true,
-            CURLOPT_POSTFIELDS => http_build_query([
+        return self::post(
+            $url,
+            [
                 'grant_type' => 'refresh_token',
                 'refresh_token' => $refresh_token,
                 'client_id' => $client_id,
                 'client_secret' => $client_secret,
                 'user-agent' => ($user_agent ?: '(Language=PHP/'.PHP_VERSION.'; Platform='.php_uname('s').'/'.php_uname('r').')')
-            ]),
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_HEADER => true,
-        ]);
-
-        $response = curl_exec($CurlHandle);
-        $info = curl_getinfo($CurlHandle);
-        $error = curl_error($CurlHandle);
-        $header_size = curl_getinfo($CurlHandle, CURLINFO_HEADER_SIZE);
-
-        curl_close($CurlHandle);
-
-        return [
-            'info' => $info,
-            'error' => $error,
-            'headers' => CurlHelper::parseHeaders($response, $header_size),
-            'response' => json_decode(substr($response, $header_size), true)
-        ];
+            ]
+        );
     }
 
     /**
@@ -175,17 +157,25 @@ class SpapiLwa
      */
     public static function clientCredentials(string $url, string $scope, string $client_id, string $client_secret, ?string $user_agent = null): array
     {
-        $CurlHandle = curl_init($url);
-
-        curl_setopt_array($CurlHandle, [
-            CURLOPT_POST => true,
-            CURLOPT_POSTFIELDS => http_build_query([
+        return self::post(
+            $url,
+            [
                 'grant_type' => 'client_credentials',
                 'scope' => $scope,
                 'client_id' => $client_id,
                 'client_secret' => $client_secret,
                 'user-agent' => ($user_agent ?: '(Language=PHP/'.PHP_VERSION.'; Platform='.php_uname('s').'/'.php_uname('r').')')
-            ]),
+            ]
+        );
+    }
+
+    private static function post(string $url, array $fields): array
+    {
+        $CurlHandle = curl_init($url);
+
+        curl_setopt_array($CurlHandle, [
+            CURLOPT_POST => true,
+            CURLOPT_POSTFIELDS => http_build_query($fields),
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_HEADER => true,
         ]);
