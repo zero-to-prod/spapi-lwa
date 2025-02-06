@@ -203,18 +203,25 @@ class SpapiLwa
 
     private static function post(string $url, array $postfields, ?string $user_agent = null, array $options = []): array
     {
-        $CurlHandle = curl_init($url);
+        $CurlHandle = curl_init();
 
         curl_setopt_array(
             $CurlHandle,
             [
+                CURLOPT_URL => $url,
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING => "",
+                CURLOPT_MAXREDIRS => 10,
+                CURLOPT_TIMEOUT => 30,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => "GET",
                 CURLOPT_HTTPHEADER => [
+                    'accept: application/json',
                     'x-amz-date: '.gmdate('Ymd\THis\Z'),
                     'user-agent: '.($user_agent ?: '(Language=PHP/'.PHP_VERSION.'; Platform='.php_uname('s').'/'.php_uname('r').')')
                 ],
-                CURLOPT_POST => true,
                 CURLOPT_POSTFIELDS => http_build_query($postfields),
-                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_POST => true,
                 CURLOPT_HEADER => true,
             ] + $options
         );
