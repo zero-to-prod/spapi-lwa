@@ -38,7 +38,7 @@
     "zero-to-prod/curl-helper": "^1.0"
   },
   "require-dev": {
-    "phpunit/phpunit": "*",
+    "phpunit/phpunit": "<12.0",
     "zero-to-prod/package-helper": "^1.0"
   },
   "autoload": {
