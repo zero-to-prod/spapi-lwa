@@ -10,13 +10,12 @@ class ClientCredentialsTest extends TestCase
     /** @test */
     public function client_credentials(): void
     {
-        $response = SpapiLwa::clientCredentials(
-            'https://httpbin.org/post',
-            'scope',
+        $response = SpapiLwa::from(
             'client_id',
             'client_secret',
+            'https://httpbin.org/post',
             'user-agent'
-        );
+        )->clientCredentials('scope');
 
         self::assertEquals(200, $response['info']['http_code']);
         self::assertEquals('client_id', $response['response']['form']['client_id']);

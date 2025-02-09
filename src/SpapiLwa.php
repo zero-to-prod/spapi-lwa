@@ -6,15 +6,85 @@ use Zerotoprod\CurlHelper\CurlHelper;
 
 class SpapiLwa
 {
+
+    /**
+     * @var string
+     */
+    private $client_id;
+    /**
+     * @var string
+     */
+    private $client_secret;
+    /**
+     * @var string
+     */
+    private $base_uri;
+    /**
+     * @var string|null
+     */
+    private $user_agent;
+    /**
+     * @var array
+     */
+    private $options;
+
+    /**
+     * Instantiate the class.
+     *
+     * @param  string       $client_id      Get this value when you register your application. Refer to Viewing your developer information.
+     * @param  string       $client_secret  Get this value when you register your application. Refer to Viewing your developer information.
+     * @param  string       $base_uri       The LWA authentication server
+     * @param  string|null  $user_agent     The user-agent for the application
+     * @param  array        $options        Merge curl options
+     *
+     * @link https://developer-docs.amazon.com/sp-api/docs/connecting-to-the-selling-partner-api
+     */
+    public function __construct(
+        string $client_id,
+        string $client_secret,
+        string $base_uri = 'https://api.amazon.com/auth/o2/token',
+        ?string $user_agent = null,
+        array $options = []
+    ) {
+        $this->client_id = $client_id;
+        $this->client_secret = $client_secret;
+        $this->base_uri = $base_uri;
+        $this->user_agent = $user_agent;
+        $this->options = $options;
+    }
+
+    /**
+     * A helper method for instantiation.
+     *
+     * @param  string       $client_id      Get this value when you register your application. Refer to Viewing your developer information.
+     * @param  string       $client_secret  Get this value when you register your application. Refer to Viewing your developer information.
+     * @param  string       $base_uri       The LWA authentication server
+     * @param  string|null  $user_agent     The user-agent for the application
+     * @param  array        $options        Merge curl options
+     *
+     * @link https://developer-docs.amazon.com/sp-api/docs/connecting-to-the-selling-partner-api
+     */
+    public static function from(
+        string $client_id,
+        string $client_secret,
+        string $base_uri = 'https://api.amazon.com/auth/o2/token',
+        ?string $user_agent = null,
+        array $options = []
+    ): self {
+        return new self(
+            $client_id,
+            $client_secret,
+            $base_uri,
+            $user_agent,
+            $options
+        );
+    }
+
     /**
      * Use this for calling operations that require authorization from a selling partner. All operations that are not grantless operations require authorization from a selling partner. When specifying this value, include the rrefresh_token parameter.
      *
-     * @param  string       $base_uri       The LWA authentication server
-     * @param  string       $refresh_token  The LWA refresh token. Get this value when the selling partner authorizes your application. For more information, refer to Authorizing Selling Partner API applications.
-     * @param  string       $client_id      Get this value when you register your application. Refer to Viewing your developer information.
-     * @param  string       $client_secret  Get this value when you register your application. Refer to Viewing your developer information.
-     * @param  string|null  $user_agent     The user-agent for the application
-     * @param  array        $options        Curl options
+     * @param  string  $refresh_token  The LWA refresh token. Get this value when the selling partner authorizes your application. For more information, refer to Authorizing Selling Partner API applications.
+     * @param  array   $options        Curl options
      *
      * @return array{
      *     info: array{
@@ -81,39 +151,31 @@ class SpapiLwa
      *
      * @link https://developer-docs.amazon.com/sp-api/docs/connecting-to-the-selling-partner-api#step-1-request-a-login-with-amazon-access-token
      */
-    public static function refreshToken(
-        string $base_uri,
+    public function refreshToken(
         string $refresh_token,
-        string $client_id,
-        string $client_secret,
-        ?string $user_agent = null,
         array $options = []
     ): array {
         return self::post(
-            $base_uri,
+            $this->base_uri,
             [
                 'grant_type' => 'refresh_token',
                 'refresh_token' => $refresh_token,
-                'client_id' => $client_id,
-                'client_secret' => $client_secret,
-                'user-agent' => ($user_agent ?: '(Language=PHP/'.PHP_VERSION.'; Platform='.php_uname('s').'/'.php_uname('r').')')
+                'client_id' => $this->client_id,
+                'client_secret' => $this->client_secret,
+                'user-agent' => ($this->user_agent ?: '(Language=PHP/'.PHP_VERSION.'; Platform='.php_uname('s').'/'.php_uname('r').')')
             ],
-            $user_agent,
-            $options
+            $this->user_agent,
+            array_merge($this->options, $options)
         );
     }
 
     /**
      * Use this for calling grantless operations. When specifying this value, include the scope parameter.
      *
-     * @param  string       $base_uri       The LWA authentication server
-     * @param  string       $scope          The scope of the LWA authorization grant. Values:
+     * @param  string  $scope               The scope of the LWA authorization grant. Values:
      *                                      - sellingpartnerapi::notifications. For the Notifications API.
      *                                      - sellingpartnerapi::client_credential:rotation. For the Application Management API.
-     * @param  string       $client_id      Get this value when you register your application. Refer to Viewing your developer information.
-     * @param  string       $client_secret  Get this value when you register your application. Refer to Viewing your developer information.
-     * @param  string|null  $user_agent     The user-agent for the application
-     * @param  array        $options        Curl options
+     * @param  array   $options             Curl options
      *
      * @return array{
      *      info: array{
@@ -179,25 +241,19 @@ class SpapiLwa
      *  }
      * @link https://developer-docs.amazon.com/sp-api/docs/connecting-to-the-selling-partner-api#step-1-request-a-login-with-amazon-access-token
      */
-    public static function clientCredentials(
-        string $base_uri,
-        string $scope,
-        string $client_id,
-        string $client_secret,
-        ?string $user_agent = null,
-        array $options = []
-    ): array {
+    public function clientCredentials(string $scope, array $options = []): array
+    {
         return self::post(
-            $base_uri,
+            $this->base_uri,
             [
                 'grant_type' => 'client_credentials',
                 'scope' => $scope,
-                'client_id' => $client_id,
-                'client_secret' => $client_secret,
-                'user-agent' => ($user_agent ?: '(Language=PHP/'.PHP_VERSION.'; Platform='.php_uname('s').'/'.php_uname('r').')')
+                'client_id' => $this->client_id,
+                'client_secret' => $this->client_secret,
+                'user-agent' => ($this->user_agent ?: '(Language=PHP/'.PHP_VERSION.'; Platform='.php_uname('s').'/'.php_uname('r').')')
             ],
-            $user_agent,
-            $options
+            $this->user_agent,
+            array_merge($this->options, $options)
         );
     }
 

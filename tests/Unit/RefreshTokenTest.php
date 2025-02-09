@@ -10,13 +10,12 @@ class RefreshTokenTest extends TestCase
     /** @test */
     public function refresh_token(): void
     {
-        $response = SpapiLwa::refreshToken(
-            'https://httpbin.org/post',
-            'refresh_token',
+        $response = SpapiLwa::from(
             'client_id',
             'client_secret',
+            'https://httpbin.org/post',
             'user-agent'
-        );
+        )->refreshToken('refresh_token');
 
         self::assertEquals(200, $response['info']['http_code']);
         self::assertEquals('client_id', $response['response']['form']['client_id']);
