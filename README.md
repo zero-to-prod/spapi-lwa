@@ -17,12 +17,15 @@
 - [Requirements](#requirements)
 - [Installation](#installation)
 - [Usage](#usage)
+    - [Access Toke from Refresh Token](#access-toke-from-refresh-token)
+    - [Access Toke from Scope](#access-token-from-scope)
 - [Local Development](./LOCAL_DEVELOPMENT.md)
 - [Contributing](#contributing)
 
 ## Introduction
 
-Connect to Amazons Selling Partner API with [Login With Amazon](https://developer-docs.amazon.com/sp-api/docs/connecting-to-the-selling-partner-api) (LWA).
+Connect to Amazons Selling Partner API with [Login With Amazon](https://developer-docs.amazon.com/sp-api/docs/connecting-to-the-selling-partner-api) (
+LWA).
 
 ## Requirements
 
@@ -40,33 +43,31 @@ This will add the package to your project’s dependencies and create an autoloa
 
 ## Usage
 
+### Access Toke from Refresh Token
+
 Use this for calling operations that require authorization from a selling partner. All operations that are not grantless operations require
 authorization from a selling partner. When specifying this value, include the rrefresh_token parameter.
 
 ```php
 use Zerotoprod\SpapiLwa\SpapiLwa;
 
-$response = SpapiLwa::refreshToken(
-            'https://api.amazon.com/auth/o2/token',
-            'refresh_token',
-            'client_id',
-            'client_secret',
-            'user-agent'
-);
+$response = SpapiLwa::from('client_id','client_secret')
+    ->refreshToken('refresh_token');
+
+$access_token = $response['response']['access_token'];
 ```
+
+### Access Token from Scope
 
 Use this for calling grantless operations. When specifying this value, include the scope parameter.
 
 ```php
 use Zerotoprod\SpapiLwa\SpapiLwa;
 
-SpapiLwa::clientCredentials(
-            'https://api.amazon.com/auth/o2/token',
-            'scope',
-            'client_id',
-            'client_secret',
-            'user-agent'
-);
+$response = SpapiLwa::from('client_id','client_secret')
+    ->clientCredentials('scope');
+
+$access_token = $response['response']['access_token'];
 ```
 
 ## Contributing
