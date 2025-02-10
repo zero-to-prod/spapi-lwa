@@ -4,6 +4,7 @@
 
 [![Repo](https://img.shields.io/badge/github-gray?logo=github)](https://github.com/zero-to-prod/spapi-lwa)
 [![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/zero-to-prod/spapi-lwa/test.yml?label=test)](https://github.com/zero-to-prod/spapi-lwa/actions)
+[![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/zero-to-prod/spapi-lwa/backwards_compatibility.yml?label=backwards_compatibility)](https://github.com/zero-to-prod/spapi-lwa/actions)
 [![Packagist Downloads](https://img.shields.io/packagist/dt/zero-to-prod/spapi-lwa?color=blue)](https://packagist.org/packages/zero-to-prod/spapi-lwa/stats)
 [![php](https://img.shields.io/packagist/php-v/zero-to-prod/spapi-lwa.svg?color=purple)](https://packagist.org/packages/zero-to-prod/spapi-lwa/stats)
 [![Packagist Version](https://img.shields.io/packagist/v/zero-to-prod/spapi-lwa?color=f28d1a)](https://packagist.org/packages/zero-to-prod/spapi-lwa)
