@@ -2,8 +2,7 @@ name: Release
 
 on:
   push:
-    tags:
-      - 'v*'
+    tags: [ 'v*' ]
 
 permissions:
   contents: write
@@ -17,48 +16,30 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Set safe directory
-        run: git config --global --add safe.directory /github/workspace
-
-      - name: "Check for BC breaks"
+      - name: Check for Backwards Compatibility Breaks
         id: bc_check
         run: |
-          git config --global --add safe.directory "${GITHUB_WORKSPACE}"
-          docker run --rm \
-            -v "${GITHUB_WORKSPACE}":/github/workspace \
-            -w /github/workspace \
-            nyholm/roave-bc-check-ga || echo "::set-output name=status::failure"
+          docker run --rm -v "${GITHUB_WORKSPACE}":/app -w /app nyholm/roave-bc-check-ga || 
+          echo "bc_breaks=true" >> $GITHUB_OUTPUT
 
-      - name: Validate Tag Version
-        if: steps.bc_check.outputs.status != 'failure'
+      - name: Validate version against Backwards Compatibility Breaks
         run: |
           TAG=${GITHUB_REF#refs/tags/v}
-          if ! [[ $TAG =~ ^([0-9]+)\.([0-9]+)\.([0-9]+)(-[0-9A-Za-z-]+(\.[0-9A-Za-z-]+)*)?(\+[0-9A-Za-z-]+(\.[0-9A-Za-z-]+)*)?$ ]]; then
-            echo "Tag version does not conform to semver."
+
+          if ! [[ $TAG =~ ^([0-9]+)\.([0-9]+)\.([0-9]+) ]]; then
+            echo "Invalid semver format"
             exit 1
           fi
-          echo "TAG_MAJOR=${BASH_REMATCH[1]}" >> $GITHUB_ENV
-          echo "TAG_MINOR=${BASH_REMATCH[2]}" >> $GITHUB_ENV
-          echo "TAG_PATCH=${BASH_REMATCH[3]}" >> $GITHUB_ENV
 
-      - name: Get Previous Tag
-        if: steps.bc_check.outputs.status == 'failure'
-        id: previous_tag
-        run: |
-          PREV_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo 'v0.0.0')
-          echo "::set-output name=tag::$PREV_TAG"
-          echo "PREV_TAG_MAJOR=${PREV_TAG#v}" | cut -d'.' -f1 >> $GITHUB_ENV
-          echo "PREV_TAG_MINOR=${PREV_TAG#v}" | cut -d'.' -f2 >> $GITHUB_ENV
-          echo "PREV_TAG_PATCH=${PREV_TAG#v}" | cut -d'.' -f3 >> $GITHUB_ENV
-
-      - name: Validate Tag Against BC Check
-        if: steps.bc_check.outputs.status == 'failure'
-        run: |
-          if [ "${{ env.TAG_MAJOR }}" -le "${{ env.PREV_TAG_MAJOR }}" ]; then
-            echo "Breaking change detected but major version did not increase."
-            exit 1
+          if [[ "${{ steps.bc_check.outputs.bc_breaks }}" == "true" ]]; then
+            PREV_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo 'v0.0.0')
+            PREV_MAJOR=${PREV_TAG#v} | cut -d'.' -f1
+          
+            if [ "${BASH_REMATCH[1]}" -le "$PREV_MAJOR" ]; then
+              echo "Breaking changes require major version bump"
+              exit 1
+            fi
           fi
-          echo "Major version correctly incremented due to breaking changes."
 
       - name: Generate Release Notes
         env:
@@ -67,23 +48,13 @@ jobs:
         run: |
           PREV_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo '')
           SINCE_DATE=$(git log -1 --format=%aI $PREV_TAG)
-
-          git fetch origin main:refs/remotes/origin/main
-
-          gh pr list \
-            --base main \
-            --state merged \
-            --json title,number,author \
+          
+          gh pr list --base main --state merged --json title,number,author \
             --search "merged:>=$SINCE_DATE" | \
-          jq -r '.[] | "- \(.title) by @\(.author.login) in #\(.number)"' > pr_notes.txt
+          jq -r '.[] | "- \(.title) by @\(.author.login) in #\(.number)"' > RELEASE_NOTES.md
 
-          git log --pretty=format:'%H' origin/main "$PREV_TAG"..HEAD --no-merges | \
-          xargs -I {} sh -c 'git show -s --format="- %s by %an <%ae> in https://github.com/$REPO/commit/{}" {}' | \
-          grep -v "Merge pull request" > commit_notes.txt
-
-          cat pr_notes.txt commit_notes.txt | sort > RELEASE_NOTES.md
-
+          git log --pretty=format:"- %s by %an in %H" $PREV_TAG..HEAD --no-merges >> RELEASE_NOTES.md
       - uses: softprops/action-gh-release@v2
-        if: steps.bc_check.outputs.status != 'failure'
+        if: ${{ !steps.bc_check.outputs.bc_breaks }}
         with:
           body_path: RELEASE_NOTES.md
