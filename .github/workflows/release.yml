@@ -1,47 +1,15 @@
-name: Release
+name: Main
 
 on:
   push:
     tags:
-      - 'v*'
+      - "v*.*.*"
 
 jobs:
-  release:
+  build:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
     steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '18'
-
-      - name: Install dependencies
-        run: |
-          npm install -g conventional-changelog-cli
-          npm install -g conventional-recommended-bump
-
-      - name: Get version from tag
-        id: get_version
-        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
-
-      - name: Generate changelog
-        run: |
-          conventional-changelog -p angular -i CHANGELOG.md -s -r 0
-
-      - name: Create GitHub Release
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Release
         uses: softprops/action-gh-release@v2
-        with:
-          name: Release ${{ env.VERSION }}
-          body_path: CHANGELOG.md
-          draft: false
-          prerelease: false
-          files: |
-            dist/*
-            *.md
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
