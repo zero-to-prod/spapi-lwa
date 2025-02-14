@@ -19,6 +19,7 @@ jobs:
       - name: Generate Release Notes
         env:
           GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
         run: |
           PREV_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo '')
           SINCE_DATE=$(git log -1 --format=%aI $PREV_TAG)
@@ -26,15 +27,15 @@ jobs:
           gh pr list \
             --base main \
             --state merged \
-            --json title,number,author,mergedAt \
+            --json title,number,author \
             --search "merged:>=$SINCE_DATE" | \
-          jq -r '.[] | "* \(.title) by @\(.author.login) in #\(.number) (\(.mergedAt))"' > pr_notes.txt
+          jq -r '.[] | "- \(.title) by @\(.author.login) in #\(.number)"' > pr_notes.txt
 
           git log "$PREV_TAG"..HEAD --no-merges \
-            --format="* %s by @%aN (%aI)" | \
+            --format="- %s by @%aN in https://github.com/$REPO/commit/%H" | \
           grep -v "Merge pull request" > commit_notes.txt
 
-          cat pr_notes.txt commit_notes.txt | sort -r > RELEASE_NOTES.md
+          cat pr_notes.txt commit_notes.txt | sort > RELEASE_NOTES.md
 
       - uses: softprops/action-gh-release@v2
         with:
