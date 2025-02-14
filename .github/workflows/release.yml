@@ -1,93 +1,47 @@
-name: release
+name: Release
 
 on:
-  workflow_run:
-    workflows: [ backwards_compatibility ]
-    types: [ completed ]
-    branches:
-      - 'main'
-
-permissions:
-  contents: write
-  pull-requests: read
+  push:
+    tags:
+      - 'v*'
 
 jobs:
   release:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-      pull-requests: read
-
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Get latest tag
-        id: get-latest-tag
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
         run: |
-          git fetch --tags
+          npm install -g conventional-changelog-cli
+          npm install -g conventional-recommended-bump
 
-          latest_tag=$(git tag --sort=-v:refname | grep '^v' | head -n 1)
+      - name: Get version from tag
+        id: get_version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
 
-          if [ -z "$latest_tag" ]; then
-            echo "No existing version tag found. Defaulting to v0.0.0"
-            latest_tag="v0.0.0"
-          fi
-
-          echo "LATEST_TAG=$latest_tag" >> $GITHUB_ENV
-
-      - name: Calculate new version
-        id: version
+      - name: Generate changelog
         run: |
-          latest_tag=${{ env.LATEST_TAG }}
+          conventional-changelog -p angular -i CHANGELOG.md -s -r 0
 
-          base_version="${latest_tag#v}"
-          major=$(echo "$base_version" | cut -d '.' -f1)
-          minor=$(echo "$base_version" | cut -d '.' -f2)
-          patch=$(echo "$base_version" | cut -d '.' -f3)
-
-          enhancement_count=$(gh pr list \
-            --base main \
-            --state merged \
-            --json labels \
-            --search "merged:>=$(git log -1 --format=%aI $latest_tag)" | \
-            jq '[.[] | select(.labels[].name == "enhancement")] | length'
-          )
-
-          if [ "$enhancement_count" -gt 0 ]; then
-            minor=$((minor + 1))
-            patch=0
-          else
-            patch=$((patch + 1))
-          fi
-
-          new_version="v$major.$minor.$patch"
-          echo "NEW_VERSION=$new_version" >> $GITHUB_ENV
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Generate release notes
-        id: release-notes
-        run: |
-          release_notes=$(gh pr list \
-            --base main \
-            --state merged \
-            --json title,number,author \
-            --search "merged:>=$(git log -1 --format=%aI ${{ env.LATEST_TAG }})" | \
-            jq -r '.[] | "- \(.title) by @\(.author.login) in #\(.number)"' | sort)
-
-          echo "$release_notes" >> release_notes.md
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Create Release
+      - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ env.NEW_VERSION }}
-          name: Release ${{ env.NEW_VERSION }}
-          body_path: release_notes.md
+          name: Release ${{ env.VERSION }}
+          body_path: CHANGELOG.md
           draft: false
           prerelease: false
+          files: |
+            dist/*
+            *.md
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
