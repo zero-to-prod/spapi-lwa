@@ -19,18 +19,13 @@ jobs:
       - name: Generate Release Notes
         id: release_notes
         run: |
-          # Get the previous tag
-          prev_tag=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
-          
-          if [ -z "$prev_tag" ]; then
-            # If no previous tag exists, get all commits
-            git log --pretty=format:"* %s by @%an in %H" > RELEASE_NOTES.md
-          else
-            # Get commits between previous tag and current
-            git log --pretty=format:"* %s by @%an in %H" ${prev_tag}..HEAD > RELEASE_NOTES.md
-          fi
-          
-          # Set output for use in release step
+          release_notes=$(gh pr list \
+            --base main \
+            --state merged \
+            --json title,number,author \
+            --search "merged:>=$(git log -1 --format=%aI ${{ env.LATEST_TAG }})" | \
+            jq -r '.[] | "- \(.title) by @\(.author.login) in #\(.number)"' | sort)
+
           echo "notes=$(cat RELEASE_NOTES.md)" >> $GITHUB_OUTPUT
 
       - name: Release
