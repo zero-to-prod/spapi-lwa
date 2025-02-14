@@ -20,6 +20,7 @@
 - [Usage](#usage)
     - [Access Toke from Refresh Token](#access-toke-from-refresh-token)
     - [Access Toke from Scope](#access-token-from-scope)
+- [Testing](#testing)
 - [Local Development](./LOCAL_DEVELOPMENT.md)
 - [Contributing](#contributing)
 
@@ -69,6 +70,17 @@ $response = SpapiLwa::from('client_id','client_secret')
     ->clientCredentials('scope');
 
 $access_token = $response['response']['access_token'];
+```
+
+## Testing
+You can test the api by faking the response:
+```php
+use Zerotoprod\SpapiLwa\SpapiLwa;
+use Zerotoprod\SpapiLwa\Support\Testing\SpapiLwaResponseFactory;
+
+SpapiLwa::fake(SpapiLwaResponseFactory::clientCredentialsOk());
+
+SpapiLwa::from('client_id', 'client_secret')
 ```
 
 ## Contributing

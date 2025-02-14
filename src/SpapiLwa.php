@@ -2,9 +2,12 @@
 
 namespace Zerotoprod\SpapiLwa;
 
+use Zerotoprod\Container\Container;
 use Zerotoprod\CurlHelper\CurlHelper;
+use Zerotoprod\SpapiLwa\Contracts\SpapiLwaInterface;
+use Zerotoprod\SpapiLwa\Support\Testing\SpapiLwaFake;
 
-class SpapiLwa
+class SpapiLwa implements SpapiLwaInterface
 {
 
     /**
@@ -39,7 +42,7 @@ class SpapiLwa
      *
      * @link https://developer-docs.amazon.com/sp-api/docs/connecting-to-the-selling-partner-api
      */
-    public function __construct(
+    private function __construct(
         string $client_id,
         string $client_secret,
         string $base_uri = 'https://api.amazon.com/auth/o2/token',
@@ -70,14 +73,10 @@ class SpapiLwa
         string $base_uri = 'https://api.amazon.com/auth/o2/token',
         ?string $user_agent = null,
         array $options = []
-    ): self {
-        return new self(
-            $client_id,
-            $client_secret,
-            $base_uri,
-            $user_agent,
-            $options
-        );
+    ): SpapiLwaInterface {
+        return Container::getInstance()->has(SpapiLwaFake::class)
+            ? Container::getInstance()->get(SpapiLwaFake::class)
+            : new self($client_id, $client_secret, $base_uri, $user_agent, $options);
     }
 
     /**
@@ -255,6 +254,20 @@ class SpapiLwa
             $this->user_agent,
             array_merge($this->options, $options)
         );
+    }
+
+    /**
+     * Fakes a response
+     */
+    public static function fake(array $response = [], ?SpapiLwaInterface $fake = null): SpapiLwaInterface
+    {
+        Container::getInstance()
+            ->instance(
+                SpapiLwaFake::class,
+                $instance = $fake ?? new SpapiLwaFake($response)
+            );
+
+        return $instance;
     }
 
     private static function post(string $url, array $postfields, ?string $user_agent = null, array $options = []): array
