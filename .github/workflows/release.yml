@@ -1,51 +1,36 @@
-name: Main
+name: Release
 
 on:
   push:
-    tags:
-      - "v*.*.*"
+    tags: ['v*']
+
+permissions:
+  contents: write
+  pull-requests: read
 
 jobs:
-  build:
+  release:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      pull-requests: read
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Get latest tag
-        id: latest_tag
-        run: |
-          git fetch --tags
-          LATEST_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
-          echo "LATEST_TAG=$LATEST_TAG" >> $GITHUB_ENV
-
-      - name: Setup GitHub CLI
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-      - run: npm install -g gh
-
       - name: Generate Release Notes
-        id: release_notes
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          release_notes=$(gh pr list \
+          PREV_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo '')
+          SINCE_DATE=$(git log -1 --format=%aI $PREV_TAG)
+          
+          gh pr list \
             --base main \
             --state merged \
             --json title,number,author \
-            --search "merged:>=$(git log -1 --format=%aI ${{ env.LATEST_TAG }})" | \
-            jq -r '.[] | "* \(.title) by @\(.author.login) in #\(.number)"' | sort)
-          
-          echo "$release_notes" > RELEASE_NOTES.md
-          echo "notes=$(cat RELEASE_NOTES.md)" >> $GITHUB_OUTPUT
+            --search "merged:>=$SINCE_DATE" | \
+          jq -r '.[] | "* \(.title) by @\(.author.login) in #\(.number)"' | \
+          sort > RELEASE_NOTES.md
 
-      - name: Release
-        uses: softprops/action-gh-release@v2
+      - uses: softprops/action-gh-release@v2
         with:
           body_path: RELEASE_NOTES.md
