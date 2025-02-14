@@ -25,7 +25,10 @@ jobs:
           echo "LATEST_TAG=$LATEST_TAG" >> $GITHUB_ENV
 
       - name: Setup GitHub CLI
-        uses: cli/cli@v2
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: npm install -g gh
 
       - name: Generate Release Notes
         id: release_notes
