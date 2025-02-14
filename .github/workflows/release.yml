@@ -22,14 +22,19 @@ jobs:
         run: |
           PREV_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo '')
           SINCE_DATE=$(git log -1 --format=%aI $PREV_TAG)
-          
+
           gh pr list \
             --base main \
             --state merged \
-            --json title,number,author \
+            --json title,number,author,mergedAt \
             --search "merged:>=$SINCE_DATE" | \
-          jq -r '.[] | "* \(.title) by @\(.author.login) in #\(.number)"' | \
-          sort > RELEASE_NOTES.md
+          jq -r '.[] | "* \(.title) by @\(.author.login) in #\(.number) (\(.mergedAt))"' > pr_notes.txt
+
+          git log "$PREV_TAG"..HEAD --no-merges \
+            --format="* %s by @%aN (%aI)" | \
+          grep -v "Merge pull request" > commit_notes.txt
+
+          cat pr_notes.txt commit_notes.txt | sort -r > RELEASE_NOTES.md
 
       - uses: softprops/action-gh-release@v2
         with:
