@@ -74,11 +74,16 @@ $access_token = $response['response']['access_token'];
 
 ## Testing
 You can test the api by faking the response:
+
 ```php
 use Zerotoprod\SpapiLwa\SpapiLwa;
 use Zerotoprod\SpapiLwa\Support\Testing\SpapiLwaResponseFactory;
 
-SpapiLwa::fake(SpapiLwaResponseFactory::clientCredentialsOk());
+$response = SpapiLwaResponseFactory::factory()
+    ->asRefreshTokenResponse()
+    ->make()
+
+SpapiLwaFake::fake($response);
 
 SpapiLwa::from('client_id', 'client_secret')
 ```
