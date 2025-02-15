@@ -62,16 +62,31 @@ class SpapiLwaResponseFactory
         ];
     }
 
+    /**
+     * Generates a response for a refresh token.
+     *
+     * @link https://github.com/zero-to-prod/spapi-lwa
+     */
     public function asRefreshTokenResponse(string $refresh_token = 'refresh_token'): self
     {
         return $this->state('response.refresh_token', $refresh_token);
     }
 
+    /**
+     * Generates a response for client credentials.
+     *
+     * @link https://github.com/zero-to-prod/spapi-lwa
+     */
     public function asClientCredentialsResponse(string $scope = 'scope'): self
     {
         return $this->state('response.scope', $scope);
     }
 
+    /**
+     * Generates an error response.
+     *
+     * @link https://github.com/zero-to-prod/spapi-lwa
+     */
     public function asError(array $merge = []): self
     {
         return $this->state(
