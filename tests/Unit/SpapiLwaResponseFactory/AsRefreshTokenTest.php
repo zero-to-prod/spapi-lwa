@@ -1,17 +1,22 @@
 <?php
 
-namespace Tests\Unit;
+namespace Tests\Unit\SpapiLwaResponseFactory;
 
 use Tests\TestCase;
 use Zerotoprod\SpapiLwa\SpapiLwa;
+use Zerotoprod\SpapiLwa\Support\Testing\SpapiLwaFake;
 use Zerotoprod\SpapiLwa\Support\Testing\SpapiLwaResponseFactory;
 
-class RefreshTokenTest extends TestCase
+class AsRefreshTokenTest extends TestCase
 {
     /** @test */
-    public function refresh_token(): void
+    public function asRefreshTokenResponse(): void
     {
-        SpapiLwa::fake(SpapiLwaResponseFactory::refreshTokenOk());
+        SpapiLwaFake::fake(
+            SpapiLwaResponseFactory::factory()
+                ->asRefreshTokenResponse()
+                ->make()
+        );
 
         $response = SpapiLwa::from('client_id', 'client_secret')
             ->refreshToken('refresh_token');
