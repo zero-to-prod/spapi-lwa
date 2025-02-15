@@ -1,24 +1,29 @@
 <?php
 
-namespace Tests\Unit;
+namespace Tests\Unit\SpapiLwaResponseFactory;
 
 use Tests\TestCase;
 use Zerotoprod\SpapiLwa\SpapiLwa;
+use Zerotoprod\SpapiLwa\Support\Testing\SpapiLwaFake;
 use Zerotoprod\SpapiLwa\Support\Testing\SpapiLwaResponseFactory;
 
-class RefreshTokenTest extends TestCase
+class AsClientCredentialsTest extends TestCase
 {
     /** @test */
-    public function refresh_token(): void
+    public function asClientCredentials(): void
     {
-        SpapiLwa::fake(SpapiLwaResponseFactory::refreshTokenOk());
+        SpapiLwaFake::fake(
+            SpapiLwaResponseFactory::factory()
+                ->asClientCredentialsResponse()
+                ->make()
+        );
 
         $response = SpapiLwa::from('client_id', 'client_secret')
-            ->refreshToken('refresh_token');
+            ->clientCredentials('scope');
 
         self::assertEquals(200, $response['info']['http_code']);
         self::assertEquals('access_token', $response['response']['access_token']);
-        self::assertEquals('refresh_token', $response['response']['refresh_token']);
+        self::assertEquals('scope', $response['response']['scope']);
         self::assertEquals('bearer', $response['response']['token_type']);
         self::assertEquals(3600, $response['response']['expires_in']);
     }

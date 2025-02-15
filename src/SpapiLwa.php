@@ -256,20 +256,6 @@ class SpapiLwa implements SpapiLwaInterface
         );
     }
 
-    /**
-     * Fakes a response
-     */
-    public static function fake(array $response = [], ?SpapiLwaInterface $fake = null): SpapiLwaInterface
-    {
-        Container::getInstance()
-            ->instance(
-                SpapiLwaFake::class,
-                $instance = $fake ?? new SpapiLwaFake($response)
-            );
-
-        return $instance;
-    }
-
     private static function post(string $url, array $postfields, ?string $user_agent = null, array $options = []): array
     {
         $CurlHandle = curl_init();
