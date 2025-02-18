@@ -7,6 +7,11 @@ use Zerotoprod\CurlHelper\CurlHelper;
 use Zerotoprod\SpapiLwa\Contracts\SpapiLwaInterface;
 use Zerotoprod\SpapiLwa\Support\Testing\SpapiLwaFake;
 
+/**
+ * Connect to Amazons Selling Partner API with Login With Amazon (LWA).
+ *
+ * @link https://github.com/zero-to-prod/spapi-lwa
+ */
 class SpapiLwa implements SpapiLwaInterface
 {
 
@@ -66,6 +71,7 @@ class SpapiLwa implements SpapiLwaInterface
      * @param  array        $options        Merge curl options
      *
      * @link https://developer-docs.amazon.com/sp-api/docs/connecting-to-the-selling-partner-api
+     * @link https://github.com/zero-to-prod/spapi-lwa
      */
     public static function from(
         string $client_id,
@@ -79,7 +85,10 @@ class SpapiLwa implements SpapiLwaInterface
             : new self($client_id, $client_secret, $base_uri, $user_agent, $options);
     }
 
-    /** @inheritDoc */
+    /**
+     * @inheritDoc
+     * @link https://github.com/zero-to-prod/spapi-lwa
+     */
     public function refreshToken(
         string $refresh_token,
         array $options = []
@@ -98,7 +107,10 @@ class SpapiLwa implements SpapiLwaInterface
         );
     }
 
-    /** @inheritDoc */
+    /**
+     * @inheritDoc
+     * @link https://github.com/zero-to-prod/spapi-lwa
+     */
     public function clientCredentials(string $scope, array $options = []): array
     {
         return self::post(

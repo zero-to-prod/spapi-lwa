@@ -2,6 +2,9 @@
 
 namespace Zerotoprod\SpapiLwa\Contracts;
 
+/**
+ * @link https://github.com/zero-to-prod/spapi-lwa
+ */
 interface SpapiLwaInterface
 {
     /**

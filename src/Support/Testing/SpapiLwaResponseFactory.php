@@ -4,6 +4,9 @@ namespace Zerotoprod\SpapiLwa\Support\Testing;
 
 use Zerotoprod\Factory\Factory;
 
+/**
+ * @link https://github.com/zero-to-prod/spapi-lwa
+ */
 class SpapiLwaResponseFactory
 {
     use Factory;
