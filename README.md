@@ -17,6 +17,8 @@
 - [Introduction](#introduction)
 - [Requirements](#requirements)
 - [Installation](#installation)
+- [Documentation Publishing](#documentation-publishing)
+    - [Automatic Documentation Publishing](#automatic-documentation-publishing)
 - [Usage](#usage)
     - [Access Toke from Refresh Token](#access-toke-from-refresh-token)
     - [Access Toke from Scope](#access-token-from-scope)
@@ -41,7 +43,40 @@ Install `Zerotoprod\SpapiLwa` via [Composer](https://getcomposer.org/):
 composer require zero-to-prod/spapi-lwa
 ```
 
-This will add the package to your project’s dependencies and create an autoloader entry for it.
+This will add the package to your project's dependencies and create an autoloader entry for it.
+
+## Documentation Publishing
+
+You can publish this README to your local documentation directory.
+
+This can be useful for providing documentation for AI agents.
+
+This can be done using the included script:
+
+```bash
+# Publish to default location (./docs/zero-to-prod/spapi-lwa)
+vendor/bin/zero-to-prod-spapi-lwa
+
+# Publish to custom directory
+vendor/bin/zero-to-prod-spapi-lwa /path/to/your/docs
+```
+
+### Automatic Documentation Publishing
+
+You can automatically publish documentation by adding the following to your `composer.json`:
+
+```json
+{
+    "scripts": {
+        "post-install-cmd": [
+            "zero-to-prod-spapi-lwa"
+        ],
+        "post-update-cmd": [
+            "zero-to-prod-spapi-lwa"
+        ]
+    }
+}
+```
 
 ## Usage
 
